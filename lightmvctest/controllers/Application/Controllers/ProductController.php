@@ -2,6 +2,8 @@
 
 namespace Application\Controllers;
 
+session_start();
+
 use \Ascmvc\AbstractApp;
 use \Ascmvc\Mvc\Controller;
 use Application\Services\CrudProductsService;
@@ -44,6 +46,11 @@ class ProductController extends Controller {
 
         $this->viewObject->assign('view', $this->view);
 
+        if($_SESSION['LOGGEDIN'] == TRUE)
+        {
+            $this->viewObject->assign('loggedin', $_SESSION['LOGGEDIN']);
+        }
+
         $this->viewObject->display('product_index.tpl');
     }
 
@@ -77,80 +84,121 @@ class ProductController extends Controller {
     {
         $this->view['bodyjs'] = 1;
 
-        if (!empty($_POST)) {
-            // Would have to sanitize and filter the $_POST array.
-            $productArray['name'] = (string) $_POST['name'];
-            $productArray['price'] = (string) $_POST['price'];
-            $productArray['description'] = (string) $_POST['description'];
-            $productArray['image'] = (string) $_FILES['image']['name'];
+        if($_SESSION['LOGGEDIN'] == TRUE)
+        {
+            $this->viewObject->assign('loggedin', $_SESSION['LOGGEDIN']);
 
-            if ($this->crudProducts->create($productArray)) {
-                $this->view['saved'] = 1;
-            } else {
-                $this->view['error'] = 1;
+            if (!empty($_POST)) {
+                // Would have to sanitize and filter the $_POST array.
+                $productArray['name'] = (string) $_POST['name'];
+                $productArray['price'] = (string) $_POST['price'];
+                $productArray['description'] = (string) $_POST['description'];
+                $productArray['image'] = (string) $_FILES['image']['name'];
+
+                if ($this->crudProducts->create($productArray)) {
+                    $this->view['saved'] = 1;
+
+
+
+                    $target_dir = $this->baseConfig['URLBASEADDR'] . "img/";
+                    $dest = $target_dir . basename($_FILES["image"]["name"]);
+                    move_uploaded_file($_FILES["image"]["name"], $dest);
+
+
+
+                } else {
+                    $this->view['error'] = 1;
+                }
             }
+
+            $this->viewObject->assign('view', $this->view);
+            $this->viewObject->display('product_add_form.tpl');
+
+        }else
+        {
+            $this->viewObject->assign('view', $this->view);
+            $this->viewObject->display('login_index.tpl');
         }
 
-        $this->viewObject->assign('view', $this->view);
-        $this->viewObject->display('product_add_form.tpl');
+
     }
 
     public function editAction()
     {
         $this->view['bodyjs'] = 1;
 
-        if (!empty($_POST)) {
-            // Would have to sanitize and filter the $_POST array.
-            $productArray['id'] = (string) $_POST['id'];
-            $productArray['name'] = (string) $_POST['name'];
-            $productArray['price'] = (string) $_POST['price'];
-            $productArray['description'] = (string) $_POST['description'];
+        if($_SESSION['LOGGEDIN'] == TRUE)
+        {
+            $this->viewObject->assign('loggedin', $_SESSION['LOGGEDIN']);
 
-            if (!empty($_FILES['image']['name'])) {
-                $productArray['image'] = (string) $_FILES['image']['name'];
+            if (!empty($_POST))
+            {
+                // Would have to sanitize and filter the $_POST array.
+                $productArray['id'] = (string) $_POST['id'];
+                $productArray['name'] = (string) $_POST['name'];
+                $productArray['price'] = (string) $_POST['price'];
+                $productArray['description'] = (string) $_POST['description'];
 
-            } else {
-                $productArray['image'] = (string) $_POST['imageoriginal'];
-            }
+                if (!empty($_FILES['image']['name'])) {
+                    $productArray['image'] = (string) $_FILES['image']['name'];
 
-            if ($this->crudProducts->update($productArray)) {
-                $this->view['saved'] = 1;
-            } else {
-                $this->view['error'] = 1;
-            }
-        } else {
-            $results = $this->readProducts();
-
-            if (is_object($results)) {
-                $results = [$this->hydrateArray($results)];
-            } else {
-                for ($i = 0; $i < count($results); $i++) {
-                    $results[$i] = $this->hydrateArray($results[$i]);
+                } else {
+                    $productArray['image'] = (string) $_POST['imageoriginal'];
                 }
+
+                if ($this->crudProducts->update($productArray)) {
+                    $this->view['saved'] = 1;
+                } else {
+                    $this->view['error'] = 1;
+                }
+            } else {
+                $results = $this->readProducts();
+
+                if (is_object($results)) {
+                    $results = [$this->hydrateArray($results)];
+                } else {
+                    for ($i = 0; $i < count($results); $i++) {
+                        $results[$i] = $this->hydrateArray($results[$i]);
+                    }
+                }
+
+                $this->view['results'] = $results;
             }
 
-            $this->view['results'] = $results;
-        }
+            $this->viewObject->assign('view', $this->view);
+            $this->viewObject->display('product_edit_form.tpl');
 
-        $this->viewObject->assign('view', $this->view);
-        $this->viewObject->display('product_edit_form.tpl');
+        }else
+        {
+            $this->viewObject->assign('view', $this->view);
+            $this->viewObject->display('login_index.tpl');
+        }
     }
 
     public function deleteAction()
     {
-        if (!empty($_GET)) {
-            // Would have to sanitize and filter the $_GET array.
-            $id = (int) $_GET['id'];
+        if($_SESSION['LOGGEDIN'] == TRUE)
+        {
+            $this->viewObject->assign('loggedin', $_SESSION['LOGGEDIN']);
+            if (!empty($_GET)) {
+                // Would have to sanitize and filter the $_GET array.
+                $id = (int) $_GET['id'];
 
-            if ($this->crudProducts->delete($id)) {
-                $this->view['saved'] = 1;
-            } else {
-                $this->view['error'] = 1;
+                if ($this->crudProducts->delete($id)) {
+                    $this->view['saved'] = 1;
+                } else {
+                    $this->view['error'] = 1;
+                }
             }
-        }
 
-        $this->viewObject->assign('view', $this->view);
-        $this->viewObject->display('product_delete.tpl');
+            $this->viewObject->assign('view', $this->view);
+            $this->viewObject->display('product_delete.tpl');
+
+        }else
+        {
+            $this->viewObject->assign('view', $this->view);
+            $this->viewObject->display('login_index.tpl');
+        }
     }
     
 }

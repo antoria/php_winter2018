@@ -2,6 +2,8 @@
 
 namespace Application\Controllers;
 
+session_start();
+
 use \Ascmvc\AbstractApp;
 use \Ascmvc\Mvc\Controller;
 
@@ -15,8 +17,8 @@ class IndexController extends Controller {
             'logo' => $baseConfig['URLBASEADDR'] . 'img/logo.png',
             'favicon' => $baseConfig['URLBASEADDR'] . 'favicon.ico',
             'appname' => $baseConfig['appName'],
-            'title' => "Andrew's Shop",
-            'author' => 'Andrew Caya',
+            'title' => "Session Project",
+            'author' => 'Dorian, Aymeric, Victor',
             'description' => 'Small CRUD application',
             'css' =>
             [
@@ -40,14 +42,16 @@ class IndexController extends Controller {
             'links' =>
             [
                 'Home' => $baseConfig['URLBASEADDR'] . 'index.php',
+                'Login' => $baseConfig['URLBASEADDR'] . 'index.php/login',
+                'Products' => $baseConfig['URLBASEADDR'] . 'index.php/product',
                 
             ],
-            /*'navMenu' =>
+            'navMenu' =>
             [
                 'Home' => $baseConfig['URLBASEADDR'] . 'index.php',
-                
-            ],*/
-        
+
+            ],
+
         ];
         
         $app->appendBaseConfig('view', $view);
@@ -58,7 +62,10 @@ class IndexController extends Controller {
         $this->view['bodyjs'] = 1;
 
         $this->viewObject->assign('view', $this->view);
-
+        if($_SESSION['LOGGEDIN'] == TRUE)
+        {
+            $this->viewObject->assign('loggedin', $_SESSION['LOGGEDIN']);
+        }
         $this->viewObject->display('index_index.tpl');
     }
 }

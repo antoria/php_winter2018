@@ -2,6 +2,8 @@
 
 namespace Application\Controllers;
 
+session_start();
+
 use \Ascmvc\AbstractApp;
 use \Ascmvc\Mvc\Controller;
 

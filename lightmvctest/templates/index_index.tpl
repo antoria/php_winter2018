@@ -12,18 +12,19 @@
 
     <div class="container">
       <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-          <ul class="nav nav-sidebar">
-          {foreach from=$view.navMenu key=navMenuEntry item=navMenuLink}
-            <li><a href="{$navMenuLink}">{$navMenuEntry}</a></li>
-          {/foreach}
-          </ul>
-        </div>
-        
         <div id="pageBody">
           <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-            <h1>Welcome to {$view.appname}!</h1>
-            <p>You can <a href="/lightmvctest/public/index.php/product/index">view a list of all products</a>!</p>
+            <h1>Hello !</h1>
+            <p>Welcome to our session project ! The team members are:</p>
+            <ul>
+              <li>Dorian ANTOINET</li>
+              <li>Aymeric DAVIAS</li>
+              <li>Victor DELENCLOS</li>
+            </ul>
+            <p>We hope our work will meet your expectations !</p>
+              {if isset($loggedin) && $loggedin == TRUE}
+              <p>PS: You are logged in !</p>
+              {/if}
           </div>
         </div> <!-- END pageBody -->
         
